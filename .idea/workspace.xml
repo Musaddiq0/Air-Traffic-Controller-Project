@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e35dc578-d73a-4886-b66e-4e69813c1bd6" name="Changes" comment="app UI settings">
+      <change afterPath="$PROJECT_DIR$/lib/sqlite-jdbc-3.8.6.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java" afterDir="false" />
     </list>
@@ -24,23 +26,26 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="2RjwlErfdHrkDRJOyacMkYooold" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
     "Downloaded.Files.Path.Enabled": "true",
     "Repository.Attach.Annotations": "false",
     "Repository.Attach.JavaDocs": "false",
     "Repository.Attach.Sources": "false",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW": "false",
+    "UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/mussy/Documents/AirTraffic Controller project/src/ClientSIde",
-    "project.structure.last.edited": "Libraries",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "settings.sync"
@@ -76,7 +81,23 @@
       <option name="project" value="LOCAL" />
       <updated>1688394864311</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="app UI settings">
+      <option name="closed" value="true" />
+      <created>1688400972171</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1688400972171</updated>
+    </task>
+    <task id="LOCAL-00004" summary="app UI settings">
+      <option name="closed" value="true" />
+      <created>1688401300175</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1688401300175</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -91,7 +112,9 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="AirTraffic Controller project" />
+    <MESSAGE value="app UI completed" />
     <MESSAGE value="app UI settings" />
     <option name="LAST_COMMIT_MESSAGE" value="app UI settings" />
   </component>
