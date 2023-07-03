@@ -1,11 +1,24 @@
 package ClientSIde;
 
+import Middleware.AirParcels;
+import Middleware.GenericTableModel;
+import Middleware.TableParcel;
+
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class ControllerHomePage {
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+
+public class ControllerHomePage extends JFrame {
     private JButton connectButton;
     private JLabel homepageStatusLabel;
     private JPanel mainPanel;
@@ -28,6 +41,7 @@ public class ControllerHomePage {
     private JTextField addRoutesAirlineTf;
     private JTextField addRsourceTf;
     private JTextField addRdstTf;
+    private JTable table1;
     private JButton addRouteButton;
     private JTextField deleteRtAirlineTf;
     private JTextField delSrcApTf;
@@ -60,6 +74,8 @@ public class ControllerHomePage {
     private JTextField addapDSTText;
     private JTextField addapTZoneText;
     private JTextField apDestCityVal;
+    private JScrollPane ViewAirportTable;
+    private JLabel viewairportStatlabel;
 
     // object used in the client class and server communication
     private ObjectOutputStream objectOutputStream;
@@ -67,4 +83,102 @@ public class ControllerHomePage {
 
 
     private Socket socket;
+
+    public ControllerHomePage(String Title) {
+        super(Title);
+        intializeGUI();
+        connectButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initialconnection();
+            }
+        });
+        viewAllAiportsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewAllAirport();
+            }
+        });
+    }
+
+    private void viewAllAirport() {
+        if (objectOutputStream != null && objectInputStream != null) {
+            // Parse the command type no input required from the user
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.ViewAllAirport));
+            } catch (IOException ex) {
+                viewairportStatlabel.setText("IOException " + ex);
+            }
+            TableParcel responseParcel = null;
+            //receiving the reply from the server (backend)
+            try {
+                responseParcel = (TableParcel) objectInputStream.readObject();
+                airportsTabTable.setSize(200,200);
+                airportsTabTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+                viewairportStatlabel.setText("Showing all the Airports on the Database");
+
+            } catch (IOException ex) {
+                viewairportStatlabel.setText("IOException " + ex);
+            } catch (ClassNotFoundException ex) {
+                viewairportStatlabel.setText("ClassNotFoundException " + ex);
+            }
+        }else{
+            homepageStatusLabel.setText("You must connect to the server first!!");
+        }
+    }
+
+    private void closeConnection() {
+        if (socket != null) {
+            homepageStatusLabel.setText("Status: closing connection");
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ControllerHomePage.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                socket = null;
+            }
+        }
+    }
+
+    private void intializeGUI() {
+        this.setContentPane(mainPanel);
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setSize(250, 150);
+        this.setVisible(true);
+        this.pack();
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e); //To change body of generated methods, choose Tools | Templates.
+                closeConnection();
+                System.exit(0);
+            }
+        });
+    }
+
+
+    private void initialconnection() {
+        closeConnection();
+        homepageStatusLabel.setText("Status: Attempting connection to server");
+        try {
+            socket = new Socket("127.0.0.1", 2000);
+
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = new  ObjectInputStream(socket.getInputStream());
+            homepageStatusLabel.setText("Status: Connected to server");
+        } catch (IOException ex) {
+            Logger.getLogger(ControllerHomePage.class.getName()).log(Level.SEVERE, null, ex);
+            homepageStatusLabel.setText(ex.toString()); // connection failed
+        }
+
+    }
+
+    public static void main(String[] args) {
+
+        ControllerHomePage app = new ControllerHomePage("Demo");
+
+
+
+    }
 }
+
