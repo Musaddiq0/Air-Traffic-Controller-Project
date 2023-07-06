@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,6 +77,7 @@ public class ControllerHomePage extends JFrame {
     private JTextField apDestCityVal;
     private JScrollPane ViewAirportTable;
     private JLabel viewairportStatlabel;
+    private JLabel addairportStatLabel;
 
     // object used in the client class and server communication
     private ObjectOutputStream objectOutputStream;
@@ -99,7 +101,154 @@ public class ControllerHomePage extends JFrame {
                 viewAllAirport();
             }
         });
+        btnAPview.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                while(!apCountryTextf.getText().isBlank() || !apCityTextf.getText().isBlank()){
+                    ViewAirPortUserinput();
+                    apCountryTextf.setText("");
+                    apCityTextf.setText("");
+                }
+                viewairportStatlabel.setText("you must provide a country atleast to be able to view the airports");
+
+//                else {
+//                viewairportStatlabel.setText("you must provide a country atleast to be able to view the airports");
+
+////                    viewCityCountryAirports();viewCityCountryAirports
+//
+//                }
+            }
+        });
+        btnAPadd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addNewAirport();
+            }
+        });
     }
+
+    private synchronized void  addNewAirport() {
+        if (objectOutputStream != null && objectInputStream != null) {
+            //getting the user input
+            String name = addapNameText.getText();
+            if(Objects.isNull(name)||name.isBlank()){
+                addairportStatLabel.setText("Airport Name is required");
+                return;
+            }
+            String city = addapCityText.getText();
+            if(Objects.isNull(city)||city.isBlank()){
+                addairportStatLabel.setText("Airport city is required");
+                return;
+            }
+            String country  = addapCountryText.getText();
+            if(Objects.isNull(country)||country.isBlank()){
+                addairportStatLabel.setText("Airport country is required");
+                return;
+            }
+            String code  = addapCodeText.getText();
+            if(Objects.isNull(code)||code.isBlank()){
+                addairportStatLabel.setText("Airport code is required");
+                return;
+            }
+            String ICAO  = addapICAOText.getText();
+            if(Objects.isNull(ICAO)||ICAO.isBlank()){
+                addairportStatLabel.setText("Airport ICAO is required");
+                return;
+            }
+            String Latitude  = addapLatitudeText.getText();
+            if(Objects.isNull(Latitude)||Latitude.isBlank()){
+                addairportStatLabel.setText("Airport Latitude is required");
+                return;
+            }
+            String longitude  = addapLongitudeText.getText();
+            if(Objects.isNull(longitude)||longitude.isBlank()){
+                addairportStatLabel.setText("Airport Name is required");
+                return;
+            }
+            String Alti  = addapAltitudeText.getText();
+            if(Objects.isNull(Alti)||Alti.isBlank()){
+                addairportStatLabel.setText("Airport Altitude is required");
+                return;
+            }
+            String offset = addapOffsetText.getText();
+            if(Objects.isNull(offset)||offset.isBlank()){
+                addairportStatLabel.setText("Airport Offset is required");
+                return;
+            }
+            String dst  = addapDSTText.getText();
+            if(Objects.isNull(dst)||dst.isBlank()){
+                addairportStatLabel.setText("Airport DST is required");
+                return;
+            }
+            String timezone  = addapTZoneText.getText();
+            if(Objects.isNull(timezone)||timezone.isBlank()){
+                addairportStatLabel.setText("Airport timezone is required");
+                return;
+            }
+// concatenating the user input to send
+            String userInput =
+                    name + ":" + city + ":" + country + ":" +
+                            code + ":" + ICAO + ":" + Latitude + ":" + longitude + ":" +
+                            Alti + ":" + offset + ":" + dst + ":" + timezone;
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.ADDAIRPORT, userInput));
+            } catch (IOException ex) {
+                addairportStatLabel.setText("IOException " + ex);
+            }
+            AirParcels reply = null;
+
+            addairportStatLabel.setText("Status: waiting for reply from server");
+            try {
+                reply = (AirParcels) objectInputStream.readObject();
+                addairportStatLabel.setText(reply.getStatus());
+
+            } catch (IOException ex) {
+                addairportStatLabel.setText("IOException " + ex);
+            } catch (ClassNotFoundException ex) {
+                addairportStatLabel.setText("ClassNotFoundException " + ex);
+            }
+        }else{
+            addairportStatLabel.setText("You must connect to the server first!!");
+        }
+    }
+
+    private void ViewAirPortUserinput() {
+        if (objectOutputStream != null && objectInputStream != null) {
+            // user input
+            String  country = apCountryTextf.getText();
+            String city = apCityTextf.getText();
+            // String to be sent using objectStreams
+            String userInput = String.format("%s:%s", city, country);
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.VIEWAIRPORT, userInput));
+            } catch (IOException ex) {
+                viewairportStatlabel.setText("IOException " + ex);
+            }
+            TableParcel responseParcel = null;
+            //receiving the reply from the server (backend)
+            try {
+                responseParcel = (TableParcel) objectInputStream.readObject();
+                String sqlResultStat = responseParcel.getStatus();
+                if(Objects.isNull(sqlResultStat)||sqlResultStat.isBlank()){
+                    viewairportStatlabel.setText("Below are the results from the DB of airports in " +country + " ," +city );
+                    airportsTabTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+                }else{
+                    viewairportStatlabel.setText(responseParcel.getStatus() +country +" ," +city);
+                    airportsTabTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+                }
+                airportsTabTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+
+            } catch (IOException ex) {
+                viewairportStatlabel.setText("IOException " + ex);
+            } catch (ClassNotFoundException ex) {
+                viewairportStatlabel.setText("ClassNotFoundException " + ex);
+            }
+
+        }else{
+            homepageStatusLabel.setText("You must connect to the server first!!");
+        }
+    }
+
 
     private void viewAllAirport() {
         if (objectOutputStream != null && objectInputStream != null) {

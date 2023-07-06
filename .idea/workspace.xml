@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e35dc578-d73a-4886-b66e-4e69813c1bd6" name="Changes" comment="Server connections set up">
-      <change afterPath="$PROJECT_DIR$/src/Middleware/AirParcels.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Middleware/GenericTableModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Middleware/TableParcel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Serverside/SqlLiteConnection.java" afterDir="false" />
+    <list default="true" id="e35dc578-d73a-4886-b66e-4e69813c1bd6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Middleware/AirParcels.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Middleware/AirParcels.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Serverside/ThreadHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serverside/ThreadHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

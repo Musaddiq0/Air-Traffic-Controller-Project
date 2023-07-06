@@ -4,8 +4,10 @@ import java.io.Serializable;
 
 public class AirParcels implements Serializable {
 
-    public enum command {ViewAllAirport};
-    String userInput;
+    private String statuslabel;
+
+    public enum command {ViewAllAirport,VIEWAIRPORT,ADDAIRPORT};
+    private String userInput;
     private final command command;
 
     /**
@@ -15,8 +17,27 @@ public class AirParcels implements Serializable {
         this.command= commandtype;
 
     }
+    public AirParcels(command command, String userInput) {
+        this.command = command;
+        this.userInput = userInput;
 
-    public AirParcels.command getCommand() {
+    }
+
+    public command getCommand() {
         return command;
+    }
+    public String getUserInput(){return userInput;}
+
+
+    public  void setStatus(String status){this.statuslabel = status;
+    }
+
+    @Override
+    public String toString() {
+        return ( command  + "\"");
+    }
+
+    public String getStatus() {
+        return statuslabel;
     }
 }
