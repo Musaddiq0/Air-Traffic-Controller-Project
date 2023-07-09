@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,22 @@ public class ThreadHandler implements Runnable {
     private void threadSays(String s) {
         System.out.println("ClientHandlerCW" + connectionNumber + ": " + s);
 
+    }
+
+    /**This method takes in a string and returns true if the string is in uppercase**/
+    public static boolean isStringInCapitalLetters(String inputString) {
+        String uppercaseString = inputString.toUpperCase();
+        return inputString.equals(uppercaseString);
+    }
+    public String capitalizeWord(String inputWord){
+        String words[]=inputWord.split("\\s");
+        String capitalizeWord="";
+        for(String w:words){
+            String first=w.substring(0,1);
+            String afterfirst=w.substring(1);
+            capitalizeWord+=first.toUpperCase()+afterfirst+" ";
+        }
+        return capitalizeWord.trim();
     }
 
     @Override
@@ -92,110 +109,11 @@ public class ThreadHandler implements Runnable {
                 }
                 else if (airParcels.getCommand() == AirParcels.command.VIEWAIRPORT) {
                     String[] splitUserInput = userInput.split(":");
-                    String city = splitUserInput[0].trim();
-                    String country = splitUserInput[1].trim();
+                    // TODO: 09/07/2023 separate the city and country using the case of the sent data
                     //checking if the city is blank to return all airport in the country typed
-                    if (city.isBlank()) {
-                        String selectSql = "SELECT * FROM airports WHERE country=?";
-                        // Sql connection to connect to the database
-                        try (Connection conn = SqlLiteConnection.getConnection();
-                             PreparedStatement prep = conn.prepareStatement(selectSql)){
-                            prep.setString(1, country); //country
-                            //Sql query execution using resultset to receive the output from the database
-                            ResultSet resultSet = prep.executeQuery();
-                            // used to store the rows of resultset for table modification
-                            List<List<Object>> data = new ArrayList<>();
-                            while (resultSet.next()) {
-                                List<Object> column = new ArrayList<>();
-                                column.add(resultSet.getInt(1));
-                                column.add(resultSet.getString(2));
-                                column.add(resultSet.getString(3));
-                                column.add(resultSet.getString(4));
-                                column.add(resultSet.getString(5));
-                                column.add(resultSet.getString(6));
-                                column.add(resultSet.getString(7));
-                                column.add(resultSet.getString(8));
-                                column.add(resultSet.getString(9));
-                                column.add(resultSet.getString(10));
-                                column.add(resultSet.getString(11));
-                                column.add(resultSet.getString(12));
-                                data.add(column);
-                            }
-                            if(data.size()> 0){
-                                List<String> columns = new ArrayList<>();
-                                columns.add("ID");
-                                columns.add("Name");
-                                columns.add("City");
-                                columns.add("Country");
-                                columns.add("Code");
-                                columns.add("ICAO");
-                                columns.add("Latitude");
-                                columns.add("Longitude");
-                                columns.add("Altitude");
-                                columns.add("Offset");
-                                columns.add("DST");
-                                columns.add("Timezone");
-                                TableParcel res = new TableParcel(columns, data);
-                                objectOutputStream.writeObject(res);
-                            }else{
-                                String noResultStat = "No results for the typed country";
-                                List<String> columns = new ArrayList<>();
-                                TableParcel res = new TableParcel(columns, data,noResultStat);
-                                res.setStatus(noResultStat);
-                                objectOutputStream.writeObject(res);
-                            }
-
-                        }
-
-                    } else if(country.isBlank()) {
-                        String selectSqlCountryCity = "SELECT * FROM airports WHERE city=?";
-                        try (Connection conn = SqlLiteConnection.getConnection();
-                             PreparedStatement prep = conn.prepareStatement(selectSqlCountryCity)) {
-                            prep.setString(1, city); //city
-                            ResultSet resultSet = prep.executeQuery();
-                            List<List<Object>> data = new ArrayList<>();
-                            while (resultSet.next()) {
-                                List<Object> column = new ArrayList<>();
-                                column.add(resultSet.getInt(1));
-                                column.add(resultSet.getString(2));
-                                column.add(resultSet.getString(3));
-                                column.add(resultSet.getString(4));
-                                column.add(resultSet.getString(5));
-                                column.add(resultSet.getString(6));
-                                column.add(resultSet.getString(7));
-                                column.add(resultSet.getString(8));
-                                column.add(resultSet.getString(9));
-                                column.add(resultSet.getString(10));
-                                column.add(resultSet.getString(11));
-                                column.add(resultSet.getString(12));
-                                data.add(column);
-                            }
-                            if(data.size()> 0 ){
-                                List<String> columns = new ArrayList<>();
-                                columns.add("ID");
-                                columns.add("Name");
-                                columns.add("City");
-                                columns.add("Country");
-                                columns.add("Code");
-                                columns.add("ICAO");
-                                columns.add("Latitude");
-                                columns.add("Longitude");
-                                columns.add("Altitude");
-                                columns.add("Offset");
-                                columns.add("DST");
-                                columns.add("Timezone");
-                                TableParcel res = new TableParcel(columns, data);
-                                objectOutputStream.writeObject(res);
-                            }else{
-                                String noResultStat = "No results for the typed country and city";
-                                List<String> columns = new ArrayList<>();
-                                TableParcel res = new TableParcel(columns, data,noResultStat);
-                                res.setStatus(noResultStat);
-                                objectOutputStream.writeObject(res);
-                            }
-                        }
-                    }
-                    else{
+                    if (splitUserInput.length == 2) {
+                        String city = splitUserInput[0].trim();
+                        String country = splitUserInput[1].trim();
                         String selectSqlCountryCity = "SELECT * FROM airports WHERE city=? AND country=?";
                         try (Connection conn = SqlLiteConnection.getConnection();
                              PreparedStatement prep = conn.prepareStatement(selectSqlCountryCity)) {
@@ -234,9 +152,10 @@ public class ThreadHandler implements Runnable {
                                 columns.add("DST");
                                 columns.add("Timezone");
                                 TableParcel res = new TableParcel(columns, data);
+                                res.setStatus("Please are the results from the DB for Airports in " +city+ " ," +country);
                                 objectOutputStream.writeObject(res);
                             }else{
-                                String noResultStat = "No results for the typed country and city";
+                                String noResultStat = "No Airports in "+city+ " ," +country;
                                 List<String> columns = new ArrayList<>();
                                 TableParcel res = new TableParcel(columns, data,noResultStat);
                                 res.setStatus(noResultStat);
@@ -244,7 +163,117 @@ public class ThreadHandler implements Runnable {
                             }
                         }
                     }
+                    else {
+                        // steps
+                        // check for country or city
+                        if(isStringInCapitalLetters(Arrays.toString(splitUserInput))){
+                            // only country entered
+                            String country = splitUserInput[0].trim();
+                            capitalizeWord(country);
+                            String selectSqlCountryCity = "SELECT * FROM airports WHERE country=?";
+                            try (Connection conn = SqlLiteConnection.getConnection();
+                                 PreparedStatement prep = conn.prepareStatement(selectSqlCountryCity)) {
+                                prep.setString(1, country); //country
+                                ResultSet resultSet = prep.executeQuery();
+                                List<List<Object>> data = new ArrayList<>();
+                                while (resultSet.next()) {
+                                    List<Object> column = new ArrayList<>();
+                                    column.add(resultSet.getInt(1));
+                                    column.add(resultSet.getString(2));
+                                    column.add(resultSet.getString(3));
+                                    column.add(resultSet.getString(4));
+                                    column.add(resultSet.getString(5));
+                                    column.add(resultSet.getString(6));
+                                    column.add(resultSet.getString(7));
+                                    column.add(resultSet.getString(8));
+                                    column.add(resultSet.getString(9));
+                                    column.add(resultSet.getString(10));
+                                    column.add(resultSet.getString(11));
+                                    column.add(resultSet.getString(12));
+                                    data.add(column);
+                                }
+                                if(data.size()> 0 ){
+                                    List<String> columns = new ArrayList<>();
+                                    columns.add("ID");
+                                    columns.add("Name");
+                                    columns.add("City");
+                                    columns.add("Country");
+                                    columns.add("Code");
+                                    columns.add("ICAO");
+                                    columns.add("Latitude");
+                                    columns.add("Longitude");
+                                    columns.add("Altitude");
+                                    columns.add("Offset");
+                                    columns.add("DST");
+                                    columns.add("Timezone");
+                                    TableParcel res = new TableParcel(columns, data);
+                                    res.setStatus("Please are the results from the DB for Airports in " +country);
+                                    objectOutputStream.writeObject(res);
+                                }else{
+                                    String noResultStat = "No Airports in " +country;
+                                    List<String> columns = new ArrayList<>();
+                                    TableParcel res = new TableParcel(columns, data,noResultStat);
+                                    res.setStatus(noResultStat);
+                                    objectOutputStream.writeObject(res);
+                                }
+                            }
 
+                        }
+                         else{
+                            //check for the ctiy only
+                            String city = splitUserInput[0].trim();
+                            city = capitalizeWord(city);
+                            String selectSqlCountryCity = "SELECT * FROM airports WHERE city=?";
+                            try (Connection conn = SqlLiteConnection.getConnection();
+                                 PreparedStatement prep = conn.prepareStatement(selectSqlCountryCity)) {
+                                prep.setString(1, city); //city
+                                ResultSet resultSet = prep.executeQuery();
+                                List<List<Object>> data = new ArrayList<>();
+                                while (resultSet.next()) {
+                                    List<Object> column = new ArrayList<>();
+                                    column.add(resultSet.getInt(1));
+                                    column.add(resultSet.getString(2));
+                                    column.add(resultSet.getString(3));
+                                    column.add(resultSet.getString(4));
+                                    column.add(resultSet.getString(5));
+                                    column.add(resultSet.getString(6));
+                                    column.add(resultSet.getString(7));
+                                    column.add(resultSet.getString(8));
+                                    column.add(resultSet.getString(9));
+                                    column.add(resultSet.getString(10));
+                                    column.add(resultSet.getString(11));
+                                    column.add(resultSet.getString(12));
+                                    data.add(column);
+                                }
+                                if(data.size()> 0 ){
+                                    List<String> columns = new ArrayList<>();
+                                    columns.add("ID");
+                                    columns.add("Name");
+                                    columns.add("City");
+                                    columns.add("Country");
+                                    columns.add("Code");
+                                    columns.add("ICAO");
+                                    columns.add("Latitude");
+                                    columns.add("Longitude");
+                                    columns.add("Altitude");
+                                    columns.add("Offset");
+                                    columns.add("DST");
+                                    columns.add("Timezone");
+                                    TableParcel res = new TableParcel(columns, data);
+                                    res.setStatus("Please are the results from the DB for Airports in " +city);
+                                    objectOutputStream.writeObject(res);
+                                }else{
+                                    String noResultStat = "No Airports for " +city;
+                                    List<String> columns = new ArrayList<>();
+                                    TableParcel res = new TableParcel(columns, data,noResultStat);
+                                    res.setStatus(noResultStat);
+                                    objectOutputStream.writeObject(res);
+                                }
+                            }
+
+                        }
+
+                    }
                 }
                 else if (airParcels.getCommand() == AirParcels.command.ADDAIRPORT){
 

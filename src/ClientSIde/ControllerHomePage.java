@@ -126,7 +126,6 @@ public class ControllerHomePage extends JFrame {
             }
         });
     }
-
     private synchronized void  addNewAirport() {
         if (objectOutputStream != null && objectInputStream != null) {
             //getting the user input
@@ -211,14 +210,28 @@ public class ControllerHomePage extends JFrame {
             addairportStatLabel.setText("You must connect to the server first!!");
         }
     }
-
+/**This method is used to view the Airport taking the user input **/
     private void ViewAirPortUserinput() {
         if (objectOutputStream != null && objectInputStream != null) {
             // user input
-            String  country = apCountryTextf.getText();
-            String city = apCityTextf.getText();
+            String  country;
+            String city;
+            String userInput;
+            if(apCityTextf.getText().isEmpty()){
+                country = apCountryTextf.getText();
+                 userInput = country.toUpperCase();
+            }
+            else if(apCountryTextf.getText().isEmpty()){
+                city = apCityTextf.getText();
+                 userInput = city.toLowerCase();
+            }
+            else {
+                country = apCountryTextf.getText();
+                city = apCityTextf.getText();
+                userInput = String.format("%s:%s", city.toLowerCase(), country.toUpperCase());
+            }
             // String to be sent using objectStreams
-            String userInput = String.format("%s:%s", city, country);
+
             try {
                 objectOutputStream.writeObject(new AirParcels(AirParcels.command.VIEWAIRPORT, userInput));
             } catch (IOException ex) {
@@ -230,10 +243,10 @@ public class ControllerHomePage extends JFrame {
                 responseParcel = (TableParcel) objectInputStream.readObject();
                 String sqlResultStat = responseParcel.getStatus();
                 if(Objects.isNull(sqlResultStat)||sqlResultStat.isBlank()){
-                    viewairportStatlabel.setText("Below are the results from the DB of airports in " +country + " ," +city );
+                    viewairportStatlabel.setText(responseParcel.getStatus() );
                     airportsTabTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
                 }else{
-                    viewairportStatlabel.setText(responseParcel.getStatus() +country +" ," +city);
+                    viewairportStatlabel.setText(responseParcel.getStatus());
                     airportsTabTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
                 }
                 airportsTabTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
@@ -249,7 +262,7 @@ public class ControllerHomePage extends JFrame {
         }
     }
 
-
+/**This method responds to the action whereby the whole active airports are displayed**/
     private void viewAllAirport() {
         if (objectOutputStream != null && objectInputStream != null) {
             // Parse the command type no input required from the user
