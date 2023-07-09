@@ -40,7 +40,7 @@ public class ThreadHandler implements Runnable {
         return inputString.equals(uppercaseString);
     }
     public String capitalizeWord(String inputWord){
-        String words[]=inputWord.split("\\s");
+        String[] words=inputWord.split("\\s");
         String capitalizeWord="";
         for(String w:words){
             String first=w.substring(0,1);
@@ -64,6 +64,9 @@ public class ThreadHandler implements Runnable {
             while ((airParcels = (AirParcels) objectInputStream.readObject()) != null) {
                 System.out.println(airParcels.getCommand());
                 String userInput = airParcels.getUserInput();
+
+                String airportQry ="select id from airports where name = ? limit 1";
+
 
 
                 if (airParcels.getCommand() == AirParcels.command.ViewAllAirport) {
@@ -109,7 +112,6 @@ public class ThreadHandler implements Runnable {
                 }
                 else if (airParcels.getCommand() == AirParcels.command.VIEWAIRPORT) {
                     String[] splitUserInput = userInput.split(":");
-                    // TODO: 09/07/2023 separate the city and country using the case of the sent data
                     //checking if the city is blank to return all airport in the country typed
                     if (splitUserInput.length == 2) {
                         String city = splitUserInput[0].trim();
@@ -276,6 +278,52 @@ public class ThreadHandler implements Runnable {
                     }
                 }
                 else if (airParcels.getCommand() == AirParcels.command.ADDAIRPORT){
+                    String[] splitUserInput = userInput.split(":");
+                    String insertSQL = "INSERT INTO airports (name, city, country, code, icao, latitude, longitude, altitude, offset,dst,timezone) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+                    String apName = splitUserInput[0].trim();
+                    String apCity = splitUserInput[1].trim();
+                    String apCountry = splitUserInput[2].trim();
+                    String apCode = splitUserInput[3].trim();
+                    String apIcao = splitUserInput[4].trim();
+                    String apLatitude = splitUserInput[5].trim();
+                    String apLongitude = splitUserInput[6].trim();
+                    String apAltitude = splitUserInput[7].trim();
+                    String apOffset = splitUserInput[8].trim();
+                    String apDst = splitUserInput[9].trim();
+                    String apTimezone = splitUserInput[10].trim();
+
+                    try(Connection conn = SqlLiteConnection.getConnection())
+                    {
+                        PreparedStatement prepStm= conn.prepareStatement(airportQry);
+                        prepStm.setString(1,splitUserInput[0]);
+                        ResultSet resultSet = prepStm.executeQuery();
+                        // using the airport name to check if it exists on the table already
+                        if (resultSet.next()){
+                            airParcels.setStatus("Chosen Airport already exist");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+
+                        prepStm = conn.prepareStatement(insertSQL);
+                        prepStm.setString(1,apName);
+                        prepStm.setString(2,apCity);
+                        prepStm.setString(3,apCountry);
+                        prepStm.setString(4,apCode);
+                        prepStm.setString(5,apIcao);
+                        prepStm.setString(6,apLatitude);
+                        prepStm.setString(7,apLongitude);
+                        prepStm.setString(8,apAltitude);
+                        prepStm.setString(9,apOffset);
+                        prepStm.setString(10,apDst);
+                        prepStm.setString(11,apTimezone);
+                        int executeStat =prepStm.executeUpdate();
+                        if (executeStat >0){
+                            airParcels.setStatus(splitUserInput[0]+  " Airport has been added to the DB");
+                            objectOutputStream.writeObject(airParcels);
+                        }
+                        // updating the status label and writing back to the client using the airtraffic parcel class
+
+                    }
 
                 }
 
