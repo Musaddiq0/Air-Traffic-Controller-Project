@@ -326,6 +326,32 @@ public class ThreadHandler implements Runnable {
                     }
 
                 }
+                else if(airParcels.getCommand() == AirParcels.command.DELETEAIRPORT){
+                    String deleteSql = "Delete FROM airports where name=?";
+                    String checkAirportSql = "select id from airports where name = ? limit 1";
+                    String airlineName = userInput.trim();
+
+                    // checking if the typed airport exists already in the Database table
+                    try(Connection conn = SqlLiteConnection.getConnection()) {
+                        PreparedStatement prepStm = conn.prepareStatement(checkAirportSql);
+                        prepStm.setString(1, airlineName);
+                        ResultSet resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()) {
+                            airParcels.setStatus("Chosen Airport does not exist on the table");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+                    }
+                    try(Connection conn = SqlLiteConnection.getConnection()){
+                        PreparedStatement prepStm = conn.prepareStatement(deleteSql);
+                        prepStm.setString(1,userInput);
+                        int sqlLStatus = prepStm.executeUpdate();
+                        if (sqlLStatus >0){
+                            airParcels.setStatus(userInput+ "Airport has been deleted from everywhere");
+                            objectOutputStream.writeObject(airParcels);
+                        }
+                    }
+                }
 
             }
 

@@ -125,6 +125,12 @@ public class ControllerHomePage extends JFrame {
                 addNewAirport();
             }
         });
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteAirport();
+            }
+        });
     }
     private synchronized void  addNewAirport() {
         if (objectOutputStream != null && objectInputStream != null) {
@@ -287,6 +293,38 @@ public class ControllerHomePage extends JFrame {
         }else{
             homepageStatusLabel.setText("You must connect to the server first!!");
         }
+    }
+    public synchronized void deleteAirport(){
+        if (objectOutputStream !=null && objectInputStream != null){
+            //Steps
+            // get the user Input ie the name of the Airport to delete
+            String userIO = apDelname.getText();
+            if(Objects.isNull(userIO)||userIO.isBlank()){
+                deleteStatLabel.setText("Airport name  is required");
+                return;
+            }
+            // use the AirTrafficParcel object to send the data to the server
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.DELETEAIRPORT, userIO));
+            } catch (IOException e) {
+                deleteStatLabel.setText("IOException " + e);
+            }
+            AirParcels serverReply = null;
+            // get the reply from the server
+            try {
+                serverReply = (AirParcels) objectInputStream.readObject();
+                deleteStatLabel.setText(serverReply.getStatus());
+
+            } catch (IOException e) {
+                deleteStatLabel.setText("IOException " + e);
+            } catch (ClassNotFoundException e) {
+                deleteStatLabel.setText("Class not found exception " + e);
+            }
+        }
+        else {
+            homepageStatusLabel.setText("Please connect to the server before you start");
+        }
+
     }
 
     private void closeConnection() {
