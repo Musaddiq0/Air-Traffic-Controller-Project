@@ -4,6 +4,7 @@ import Middleware.AirParcels;
 import Middleware.TableParcel;
 
 import javax.swing.*;
+import javax.swing.text.TabExpander;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -469,6 +470,74 @@ public class ThreadHandler implements Runnable {
 
                     }
                 }
+                else if(airParcels.getCommand() == AirParcels.command.VIEWAIRLINEROUTES){
+
+                    // create the SQL statement
+                    String viewRoutes = "SELECT st.name AS source, dt.name as destination FROM routes JOIN airports st ON (st.id== routes.source_id) JOIN airports dt  ON  (dt.id == routes.dest_id) JOIN airlines ON (airlines.id== routes.airline_id) WHERE  airlines.name =? GROUP BY st.name, dt.name";
+                    String airlineName = userInput.trim();
+                    try(Connection conn = SqlLiteConnection.getConnection()){
+                        PreparedStatement prepStm = conn.prepareStatement(viewRoutes);
+                        prepStm.setString(1,airlineName);
+                        ResultSet resultSet = prepStm.executeQuery();
+                        List<List<Object>> data = new ArrayList<>();
+                        while (resultSet.next()){
+                            List<Object> column= new ArrayList<>();
+                            column.add(resultSet.getString(1));
+                            column.add(resultSet.getString(2));
+                            data.add(column);
+                        }
+                        if (data.size()>0){
+                            List<String> columns = new ArrayList<>();
+                            columns.add("Source");
+                            columns.add("Destination");
+                            TableParcel res = new TableParcel(columns, data);
+                            objectOutputStream.writeObject(res);
+                        }else {
+                            String noResultSet = userInput+ " " + "has no active route currently";
+                            List<String> columns = new ArrayList<>();
+                            TableParcel res = new TableParcel(columns, data, noResultSet);
+                            objectOutputStream.writeObject(res);
+                        }
+
+                    }
+                }
+                else if (airParcels.getCommand()== AirParcels.command.VIEWACTIVEAIRLINESINDB){
+
+                    // create the SQL query to view all the airports in the DB in ascending order
+                    String viewAllAirlinesSql = "SELECT DISTINCT * FROM airlines WHERE NOT active = 'N'";
+
+                    // open the SQL connection to execute the query
+                    try (Connection conn = SqlLiteConnection.getConnection();
+                         PreparedStatement prep = conn.prepareStatement(viewAllAirlinesSql)){
+                        ResultSet resultSet = prep.executeQuery();
+                        // used to store the rows of resultset for table modification
+                        List<List<Object>> data = new ArrayList<>();
+                        while (resultSet.next()) {
+                            List<Object> column = new ArrayList<>();
+                            column.add(resultSet.getInt(1));
+                            column.add(resultSet.getString(2));
+                            column.add(resultSet.getString(3));
+                            column.add(resultSet.getString(4));
+                            column.add(resultSet.getString(5));
+                            column.add(resultSet.getString(6));
+                            column.add(resultSet.getString(7));
+                            column.add(resultSet.getString(8));
+                            data.add(column);
+                        }
+                        List<String> columns = new ArrayList<>();
+                        columns.add("ID");
+                        columns.add("Name");
+                        columns.add("Alias");
+                        columns.add("Iata");
+                        columns.add("ICAO");
+                        columns.add("CallSign");
+                        columns.add("Country");
+                        columns.add("active");
+                        TableParcel res = new TableParcel(columns, data);
+                        objectOutputStream.writeObject(res);
+                    }
+                }
+
 
             }
 
@@ -486,7 +555,7 @@ public class ThreadHandler implements Runnable {
         }
 
     }
-    String searchAp = "SELECT airlines.name FROM airlines  JOIN routes ON (airlines.id== routes.airline_id) JOIN airports ON (airports.id== routes.source_id)  OR (airports.id== routes.dest_id)  WHERE  airports.country =? AND airports.city =? GROUP by airlines.name";
+//    String searchAp = "SELECT airlines.name FROM airlines  JOIN routes ON (airlines.id== routes.airline_id) JOIN airports ON (airports.id== routes.source_id)  OR (airports.id== routes.dest_id)  WHERE  airports.country =? AND airports.city =? GROUP by airlines.name";
 
 }
 

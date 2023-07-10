@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e35dc578-d73a-4886-b66e-4e69813c1bd6" name="Changes" comment="Delete Airport feature done">
+    <list default="true" id="e35dc578-d73a-4886-b66e-4e69813c1bd6" name="Changes" comment="Airport feature done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AirTraffic Controller project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/AirTraffic Controller project.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Middleware/AirParcels.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Middleware/AirParcels.java" afterDir="false" />
@@ -191,7 +190,15 @@
       <option name="project" value="LOCAL" />
       <updated>1688866953999</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Airport feature done">
+      <option name="closed" value="true" />
+      <created>1689017070273</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1689017070273</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -215,119 +222,120 @@
     <MESSAGE value="View Airport feature fixed" />
     <MESSAGE value="Add Airport feature done" />
     <MESSAGE value="Delete Airport feature done" />
-    <option name="LAST_COMMIT_MESSAGE" value="Delete Airport feature done" />
+    <MESSAGE value="Airport feature done" />
+    <option name="LAST_COMMIT_MESSAGE" value="Airport feature done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>106</line>
+          <line>107</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>107</line>
+          <line>108</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>111</line>
+          <line>112</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>116</line>
+          <line>117</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>167</line>
+          <line>168</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>274</line>
+          <line>288</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>114</line>
+          <line>115</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>274</line>
+          <line>275</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>171</line>
+          <line>172</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>224</line>
+          <line>225</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>168</line>
+          <line>169</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>228</line>
+          <line>229</line>
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>227</line>
+          <line>228</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>231</line>
+          <line>232</line>
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>283</line>
+          <line>297</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>286</line>
+          <line>300</line>
           <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>355</line>
+          <line>356</line>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>365</line>
+          <line>379</line>
           <option name="timeStamp" value="28" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>50</line>
+          <line>51</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>259</line>
+          <line>273</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>307</line>
+          <line>321</line>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>42</line>
+          <line>43</line>
           <properties class="Serverside.ThreadHandler" method="capitalizeWord">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -336,7 +344,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/Serverside/ThreadHandler.java</url>
-          <line>38</line>
+          <line>39</line>
           <properties class="Serverside.ThreadHandler" method="isStringInCapitalLetters">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -345,7 +353,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/ClientSIde/ControllerHomePage.java</url>
-          <line>363</line>
+          <line>377</line>
           <properties class="ClientSIde.ControllerHomePage" method="searchForAirlinesTruAirport">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -356,9 +364,15 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
+        <watch expression="splitUserInput" language="JAVA" />
+        <watch expression="data" language="JAVA" />
+        <watch expression="separatedUserInput" language="JAVA" />
+        <watch expression="resultSet" language="JAVA" />
+        <watch expression="data" language="JAVA" />
+        <watch expression="city" language="JAVA" />
+        <watch expression="country" language="JAVA" />
         <watch expression="userInput" language="JAVA" />
         <watch expression="responseParcel" language="JAVA" />
-        <watch expression="userInput" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

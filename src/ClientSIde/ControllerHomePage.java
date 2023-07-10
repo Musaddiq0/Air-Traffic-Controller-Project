@@ -78,6 +78,7 @@ public class ControllerHomePage extends JFrame {
     private JLabel viewairportStatlabel;
     private JLabel addairportStatLabel;
     private JLabel airlineAirportLabel;
+    private JLabel viewRoutesLabel;
 
     // object used in the client class and server communication
     private ObjectOutputStream objectOutputStream;
@@ -137,6 +138,19 @@ public class ControllerHomePage extends JFrame {
                 searchForAirlinesTruAirport();
             }
         });
+        viewAirlineRouteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewRoutesForAirlines();
+            }
+        });
+        viewActiveRoutesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewAllAirlinesInDB();
+            }
+        });
+
     }
     private synchronized void  addNewAirport() {
         if (objectOutputStream != null && objectInputStream != null) {
@@ -399,6 +413,72 @@ public class ControllerHomePage extends JFrame {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
+        }
+
+    }
+
+    public void viewRoutesForAirlines() {
+        if (objectOutputStream != null && objectInputStream != null) {
+            //get the user input
+            String userInput = airlineVal.getText();
+            if(Objects.isNull(userInput)||userInput.isBlank()){
+                viewRoutesLabel.setText("Airline name  is required");
+                return;
+            }
+
+            //parse user input and the command using the AirTrafficParcel object  to the server (backend)
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.VIEWAIRLINEROUTES, userInput));
+            } catch (IOException e) {
+                viewRoutesLabel.setText("IOException " + e);
+            }
+
+            viewRoutesLabel.setText("Status: waiting for reply from server");
+            TableParcel responseParcel = null;
+            //receiving the reply from the server (backend)
+            try {
+                responseParcel= (TableParcel) objectInputStream.readObject();
+                String status = responseParcel.getStatus();
+                if(Objects.isNull(status)||status.isBlank()){
+                    viewRoutesLabel.setText(responseParcel.getStatus());
+                    viewRoutesTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+                }else{
+                    viewRoutesLabel.setText(responseParcel.getStatus());
+                    viewRoutesTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+                }
+                viewRoutesTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                System.out.println(e.getMessage());
+            }
+
+        } else {
+            homepageStatusLabel.setText("You must connect to the server first!!");
+        }
+    }
+    private void viewAllAirlinesInDB() {
+        if (objectOutputStream != null && objectInputStream != null) {
+            // Parse the command type no input required from the user
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.VIEWACTIVEAIRLINESINDB));
+            } catch (IOException ex) {
+                viewRoutesLabel.setText("IOException " + ex);
+            }
+            TableParcel responseParcel = null;
+            //receiving the reply from the server (backend)
+            try {
+                responseParcel = (TableParcel) objectInputStream.readObject();
+                viewRoutesTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+                viewRoutesLabel.setText("Showing all the active Airlines on the Database");
+
+            } catch (IOException ex) {
+                viewRoutesLabel.setText("IOException " + ex);
+            } catch (ClassNotFoundException ex) {
+                viewRoutesLabel.setText("ClassNotFoundException " + ex);
+            }
+        }else{
+            homepageStatusLabel.setText("You must connect to the server first!!");
         }
 
     }
