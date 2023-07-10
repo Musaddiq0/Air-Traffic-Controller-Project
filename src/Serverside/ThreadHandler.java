@@ -3,6 +3,7 @@ package Serverside;
 import Middleware.AirParcels;
 import Middleware.TableParcel;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -170,12 +171,12 @@ public class ThreadHandler implements Runnable {
                         // check for country or city
                         if(isStringInCapitalLetters(Arrays.toString(splitUserInput))){
                             // only country entered
+
                             String country = splitUserInput[0].trim();
-                            capitalizeWord(country);
                             String selectSqlCountryCity = "SELECT * FROM airports WHERE country=?";
                             try (Connection conn = SqlLiteConnection.getConnection();
                                  PreparedStatement prep = conn.prepareStatement(selectSqlCountryCity)) {
-                                prep.setString(1, country); //country
+                                prep.setString(1,  capitalizeWord(country.toLowerCase())); //country
                                 ResultSet resultSet = prep.executeQuery();
                                 List<List<Object>> data = new ArrayList<>();
                                 while (resultSet.next()) {
@@ -352,6 +353,122 @@ public class ThreadHandler implements Runnable {
                         }
                     }
                 }
+                else if(airParcels.getCommand() == AirParcels.command.VIEWAIRLINESGOINGTRUAIRPORT){
+                    //steps
+                    //get the user input from the GUI
+                    String[] separatedUserInput = userInput.split(":");
+                    //Generate the SQL query according to the user input.
+
+                    //country and city entered
+                    if (separatedUserInput.length == 2 ){
+                        String sqlQuery = "SELECT airlines.name FROM airlines  JOIN routes ON (airlines.id== routes.airline_id) JOIN airports ON (airports.id== routes.source_id)  OR (airports.id== routes.dest_id)  WHERE  airports.country =? AND airports.city =? GROUP by airlines.name";
+                        String country = separatedUserInput[1].trim();
+                        String city = separatedUserInput[0].trim();
+                        try(Connection conn = SqlLiteConnection.getConnection()){
+                            PreparedStatement prepStm = conn.prepareStatement(sqlQuery);
+                            prepStm.setString(1,country); //country
+                            prepStm.setString(2,city); //city
+                            ResultSet resultSet = prepStm.executeQuery();
+                            List<List<Object>> data = new ArrayList<>();
+                            while (resultSet.next()){
+                                List<Object> column= new ArrayList<>();
+                                column.add(resultSet.getString(1));
+                                data.add(column);
+                            }
+                            if(data.size() > 0){
+                                List<String> columns = new ArrayList<>();
+                                // table columns creation
+                                columns.add("Airlines");
+                                TableParcel res = new TableParcel(columns, data);
+                                //sending the TableResponseParcel object with the columns and data containing the results from the SQL query
+                                objectOutputStream.writeObject(res);
+                            }else{
+                                //clearing the table if no result from the query
+                                String noResultSet = "No Airlines fly through" +city+ "," +country;
+                                List<String> columns = new ArrayList<>();
+                                TableParcel res = new TableParcel(columns,data,noResultSet);
+                                res.setStatus(noResultSet);
+                                objectOutputStream.writeObject(res);
+
+                            }
+
+                        }
+                    }
+                    //country or city entered
+                    else{
+                        //checking if the string array contains strings in upper or lower case
+
+                        //country entered only
+                        if (isStringInCapitalLetters(Arrays.toString(separatedUserInput))){
+                            String sqlQuery = "SELECT airlines.name FROM airlines  JOIN routes ON (airlines.id== routes.airline_id) JOIN airports ON (airports.id== routes.source_id)  OR (airports.id== routes.dest_id)  WHERE  airports.country =? OR airports.city ='?' GROUP by airlines.name";
+                            try(Connection conn = SqlLiteConnection.getConnection()){
+                                PreparedStatement prepStm = conn.prepareStatement(sqlQuery);
+                                prepStm.setString(1,capitalizeWord(separatedUserInput[0].toLowerCase())); //country
+                                ResultSet resultSet = prepStm.executeQuery();
+                                List<List<Object>> data = new ArrayList<>();
+                                while (resultSet.next()){
+                                    List<Object> column= new ArrayList<>();
+                                    column.add(resultSet.getString(1));
+                                    data.add(column);
+                                }
+                                if(data.size() > 0){
+                                    List<String> columns = new ArrayList<>();
+                                    // table columns creation
+                                    columns.add("Airlines");
+                                    TableParcel res = new TableParcel(columns, data);
+                                    //sending the TableResponseParcel object with the columns and data containing the results from the SQL query
+                                    objectOutputStream.writeObject(res);
+                                }else{
+                                    //clearing the table if no result from the query
+                                    String noResultSet = "No Airlines fly through "+ Arrays.toString(separatedUserInput);
+                                    List<String> columns = new ArrayList<>();
+                                    TableParcel res = new TableParcel(columns,data,noResultSet);
+                                    res.setStatus(noResultSet);
+                                    objectOutputStream.writeObject(res);
+
+                                }
+
+                            }
+
+                        }
+
+                        //city only
+                        else{
+                            String sqlQuery = "SELECT airlines.name FROM airlines  JOIN routes ON (airlines.id== routes.airline_id) JOIN airports ON (airports.id== routes.source_id)  OR (airports.id== routes.dest_id)  WHERE  airports.country ='?' OR airports.city =? GROUP by airlines.name";
+                            capitalizeWord(separatedUserInput[0].toLowerCase());
+                            try(Connection conn = SqlLiteConnection.getConnection()){
+                                PreparedStatement prepStm = conn.prepareStatement(sqlQuery);
+                                prepStm.setString(1,capitalizeWord(separatedUserInput[0].toLowerCase())); //city
+                                ResultSet resultSet = prepStm.executeQuery();
+                                List<List<Object>> data = new ArrayList<>();
+                                while (resultSet.next()){
+                                    List<Object> column= new ArrayList<>();
+                                    column.add(resultSet.getString(1));
+                                    data.add(column);
+                                }
+                                if(data.size() > 0){
+                                    List<String> columns = new ArrayList<>();
+                                    // table columns creation
+                                    columns.add("Airlines");
+                                    TableParcel res = new TableParcel(columns, data);
+                                    //sending the TableResponseParcel object with the columns and data containing the results from the SQL query
+                                    objectOutputStream.writeObject(res);
+                                }else{
+                                    //clearing the table if no result from the query
+                                    String noResultSet = "No Airlines fly through "+ Arrays.toString(separatedUserInput);
+                                    List<String> columns = new ArrayList<>();
+                                    TableParcel res = new TableParcel(columns,data,noResultSet);
+                                    res.setStatus(noResultSet);
+                                    objectOutputStream.writeObject(res);
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                }
 
             }
 
@@ -369,5 +486,7 @@ public class ThreadHandler implements Runnable {
         }
 
     }
+    String searchAp = "SELECT airlines.name FROM airlines  JOIN routes ON (airlines.id== routes.airline_id) JOIN airports ON (airports.id== routes.source_id)  OR (airports.id== routes.dest_id)  WHERE  airports.country =? AND airports.city =? GROUP by airlines.name";
+
 }
 

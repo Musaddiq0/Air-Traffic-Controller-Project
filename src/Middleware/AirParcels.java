@@ -6,7 +6,7 @@ public class AirParcels implements Serializable {
 
     private String statuslabel;
 
-    public enum command {ViewAllAirport,VIEWAIRPORT,ADDAIRPORT,DELETEAIRPORT}
+    public enum command {ViewAllAirport,VIEWAIRPORT,ADDAIRPORT,DELETEAIRPORT,VIEWAIRLINESGOINGTRUAIRPORT}
     private String userInput;
     private final command command;
 

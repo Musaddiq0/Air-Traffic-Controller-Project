@@ -3,6 +3,7 @@ package ClientSIde;
 import Middleware.AirParcels;
 import Middleware.GenericTableModel;
 import Middleware.TableParcel;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -16,8 +17,6 @@ import java.net.Socket;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 public class ControllerHomePage extends JFrame {
     private JButton connectButton;
@@ -59,7 +58,7 @@ public class ControllerHomePage extends JFrame {
     private JTextField apDelname;
     private JButton deleteButton;
     private JLabel deleteStatLabel;
-    private JTextField apViewAirlneDepCityVal;
+    private JTextField apCountry;
     private JTable viewAirlinesAPTable;
     private JButton viewButton;
     private JPanel addAirportPanel;
@@ -74,10 +73,11 @@ public class ControllerHomePage extends JFrame {
     private JTextField addapAltitudeText;
     private JTextField addapDSTText;
     private JTextField addapTZoneText;
-    private JTextField apDestCityVal;
+    private JTextField apCity;
     private JScrollPane ViewAirportTable;
     private JLabel viewairportStatlabel;
     private JLabel addairportStatLabel;
+    private JLabel airlineAirportLabel;
 
     // object used in the client class and server communication
     private ObjectOutputStream objectOutputStream;
@@ -129,6 +129,12 @@ public class ControllerHomePage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteAirport();
+            }
+        });
+        viewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchForAirlinesTruAirport();
             }
         });
     }
@@ -216,26 +222,55 @@ public class ControllerHomePage extends JFrame {
             addairportStatLabel.setText("You must connect to the server first!!");
         }
     }
+
+    /**This method returns a concatenated string containing the text in the TextFields according to how they are on the GUI
+     * @param textF1 First position text field identified as the part of the string in lowercase
+     * @param textF2 Second position text field identified as the part of the returned string in uppercase
+     * **/
+    public String arrageInputUI(@org.jetbrains.annotations.NotNull JTextField textF1, @NotNull JTextField textF2){
+        String text1 = textF1.getText();
+        String text2 = textF2.getText();
+        String word;
+        if(Objects.isNull(text1)||text1.isBlank()){
+            text2 = textF2.getText();
+            word = text2.toLowerCase();
+            textF2.setText("");
+            return word;
+        }
+        else if(Objects.isNull(text2)||text2.isBlank()){
+            text1 = textF1.getText();
+            word = text1.toUpperCase();
+            textF1.setText("");
+            return word;
+        }
+        else{
+            text1 = textF1.getText();
+            text2 = textF2.getText();
+            word = String.format("%s:%s", text1.toLowerCase(), text2.toUpperCase());
+            textF1.setText("");
+            textF2.setText("");
+            return word;
+        }
+
+    }
 /**This method is used to view the Airport taking the user input **/
     private void ViewAirPortUserinput() {
         if (objectOutputStream != null && objectInputStream != null) {
             // user input
-            String  country;
-            String city;
-            String userInput;
-            if(apCityTextf.getText().isEmpty()){
-                country = apCountryTextf.getText();
-                 userInput = country.toUpperCase();
-            }
-            else if(apCountryTextf.getText().isEmpty()){
-                city = apCityTextf.getText();
-                 userInput = city.toLowerCase();
-            }
-            else {
-                country = apCountryTextf.getText();
-                city = apCityTextf.getText();
-                userInput = String.format("%s:%s", city.toLowerCase(), country.toUpperCase());
-            }
+            String userInput = arrageInputUI(apCountryTextf,apCityTextf);
+//            if(apCityTextf.getText().isEmpty()){
+//                country = apCountryTextf.getText();
+//                 userInput = country.toUpperCase();
+//            }
+//            else if(apCountryTextf.getText().isEmpty()){
+//                city = apCityTextf.getText();
+//                 userInput = city.toLowerCase();
+//            }
+//            else {
+//                country = apCountryTextf.getText();
+//                city = apCityTextf.getText();
+//                userInput = String.format("%s:%s", city.toLowerCase(), country.toUpperCase());
+//            }
             // String to be sent using objectStreams
 
             try {
@@ -323,6 +358,47 @@ public class ControllerHomePage extends JFrame {
         }
         else {
             homepageStatusLabel.setText("Please connect to the server before you start");
+        }
+
+    }
+    public  void searchForAirlinesTruAirport(){
+        // gets the user input
+//        String city = apCountry.getText();
+//        if(Objects.isNull(city)||city.isBlank()){
+//            airlineAirportLabel.setText("City name  is required");
+//            return;
+//        }
+//        //destination Airport city
+//        String country = apCity.getText();
+//        if(Objects.isNull(country)||country.isBlank()){
+//            airlineAirportLabel.setText("city name  is required");
+//            return;
+//        }
+        // concatenate the Strings to send
+        String userInput = arrageInputUI(apCountry,apCity);
+
+
+        //send the data using the Air traffic parcel
+        try {
+            objectOutputStream.writeObject(new AirParcels(AirParcels.command.VIEWAIRLINESGOINGTRUAIRPORT, userInput));
+        } catch (IOException e) {
+            airlineAirportLabel.setText("IOException " + e);
+        }
+        TableParcel responseParcel ;
+        //receiving the reply from the server (backend)
+        try {
+            responseParcel= (TableParcel) objectInputStream.readObject();
+            String status = responseParcel.getStatus();
+            if(Objects.isNull(status)||status.isBlank()){
+                airlineAirportLabel.setText(responseParcel.getStatus());
+                viewAirlinesAPTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+            }else{
+                airlineAirportLabel.setText(responseParcel.getStatus());
+                viewAirlinesAPTable.setModel(new GenericTableModel(responseParcel.columns, responseParcel.data));
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
     }
