@@ -118,7 +118,6 @@ public class ControllerHomePage extends JFrame {
                     apCountryTextf.setText("");
                     apCityTextf.setText("");
                 }
-                viewairportStatlabel.setText("you must provide a country atleast to be able to view the airports");
 
 //                else {
 //                viewairportStatlabel.setText("you must provide a country atleast to be able to view the airports");

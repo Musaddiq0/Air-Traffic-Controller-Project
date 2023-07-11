@@ -69,8 +69,6 @@ public class ThreadHandler implements Runnable {
 
                 String airportQry ="select id from airports where name = ? limit 1";
 
-
-
                 if (airParcels.getCommand() == AirParcels.command.ViewAllAirport) {
                     String sqlQuery = "SELECT DISTINCT * FROM airports ORDER by country";
                     // create the SQL connection from the SQL class and run the SQL query
@@ -701,8 +699,6 @@ public class ThreadHandler implements Runnable {
                     }
 
                 }
-
-
             }
 
         } catch (IOException ex) {
