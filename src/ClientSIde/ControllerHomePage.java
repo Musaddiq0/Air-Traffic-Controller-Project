@@ -6,6 +6,7 @@ import Middleware.TableParcel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.text.TabExpander;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -79,6 +80,13 @@ public class ControllerHomePage extends JFrame {
     private JLabel addairportStatLabel;
     private JLabel airlineAirportLabel;
     private JLabel viewRoutesLabel;
+    private JLabel addRoutesLabel;
+    private JPanel ViewAirlinesTruRoutes;
+    private JTextField srcAirportName;
+    private JTextField destiAirportName;
+    private JButton view;
+    private JTable viewRArlineTable;
+    private JLabel airlineRLabel;
 
     // object used in the client class and server communication
     private ObjectOutputStream objectOutputStream;
@@ -151,7 +159,154 @@ public class ControllerHomePage extends JFrame {
             }
         });
 
+        addRouteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addRoutes();
+            }
+        });
+        deleteRouteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteRoute();
+            }
+        });
+        view.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RoutesAirline();
+            }
+        });
     }
+
+    private void RoutesAirline(){
+        if (objectOutputStream != null && objectInputStream != null) {
+            // get the user input from the text field
+            String source = srcAirportName.getText();
+            if(Objects.isNull(source)||source.isBlank()){
+                airlineRLabel.setText("Source airport name  is required");
+                return;
+            }
+            String destination = destiAirportName.getText();
+            if(Objects.isNull(destination)||destination.isBlank()){
+                airlineRLabel.setText("Destination airport name  is required");
+                return;
+            }
+            //concatenate the user input to a string for sending
+            String userInput = String.format("%s:%s", source, destination);
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.VIEWAIIRLINESTOPS, userInput));
+            } catch (IOException e) {
+                airlineRLabel.setText("IOException " + e);
+            }
+            TableParcel tableResponseParcel;
+//            AirTrafficParcel airTrafficParcel ;
+
+            try {
+                tableResponseParcel = (TableParcel) objectInputStream.readObject();
+                String status = tableResponseParcel.getStatus();
+                if (Objects.isNull(status)||status.isBlank() ){
+                    airlineRLabel.setText("The table below contains the Airlines that go from "  +source+ " airport to " +destination+ " airport");
+                    viewRArlineTable.setModel(new GenericTableModel(tableResponseParcel.columns, tableResponseParcel.data));
+                }
+                else {
+                    viewRArlineTable.setModel(new GenericTableModel(tableResponseParcel.columns, tableResponseParcel.data));
+                    airlineRLabel.setText(tableResponseParcel.getStatus());
+                }
+            } catch (IOException ex) {
+                airlineRLabel.setText("IOException " + ex);
+            } catch (ClassNotFoundException ex) {
+                airlineRLabel.setText("ClassNotFoundException " + ex);
+            }
+        } else {
+            homepageStatusLabel.setText("You must connect to the server first!!");
+        }
+    }
+
+    private synchronized void deleteRoute() {
+        if (objectOutputStream != null && objectInputStream != null) {
+            //get the user input
+            String airlineName = deleteRtAirlineTf.getText();
+            if(Objects.isNull(airlineName)||airlineName.isBlank()){
+                deleteStatusLabel.setText("Airline name  is required");
+                return;
+            }
+            String sourceAirport = delSrcApTf.getText();
+            if(Objects.isNull(sourceAirport)||sourceAirport.isBlank()){
+                deleteStatusLabel.setText("Source airport name  is required");
+                return;
+            }
+            String destAirport = DelRtDstApTf.getText() ;
+            if(Objects.isNull(destAirport)||destAirport.isBlank()){
+                deleteStatusLabel.setText("Destination airport name  is required");
+                return;
+            }
+            //joining the user input to be sent to the server(backend)
+            String userInput = String.format("%s:%s:%s",airlineName,sourceAirport,destAirport);
+
+            //parse user input and the command using the AirTrafficParcel object  to the server (backend)
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.DELETEAIRLINEROUTE, userInput));
+            } catch (IOException e) {
+                deleteStatusLabel.setText("IOException " + e);
+            }
+
+            deleteStatusLabel.setText("Status: waiting for reply from server");
+            AirParcels response = null;
+            //receiving the reply from the server (backend)
+            try {
+                response= (AirParcels) objectInputStream.readObject();
+                deleteStatusLabel.setText(response.getStatus());
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                System.out.println(e.getMessage());
+            }
+
+        } else {
+            homepageStatusLabel.setText("You must connect to the server first!!");
+        }
+    }
+
+    private synchronized void addRoutes() {
+        if (objectOutputStream != null && objectInputStream != null) {
+
+            String source  = addRsourceTf.getText();
+            if(Objects.isNull(source)||source.isBlank()){
+                addRoutesLabel.setText("Source airport name  is required");
+                return;
+            }
+            String destination = addRdstTf.getText();
+            if(Objects.isNull(destination)||destination.isBlank()){
+                addRoutesLabel.setText("Destination airport name  is required");
+                return;
+            }
+            String airline = addRoutesAirlineTf.getText();
+            if(Objects.isNull(airline)||airline.isBlank()){
+                addRoutesLabel.setText("Airline name  is required");
+                return;
+            }
+            String userInput  = String.format("%s:%s:%s",source,destination,airline);
+            try {
+                objectOutputStream.writeObject(new AirParcels(AirParcels.command.ADDNEWAIRLINEROUTE, userInput));
+            } catch (IOException ex) {
+                addRoutesLabel.setText("IOException " + ex);
+            }
+            AirParcels reply = null;
+
+            addRoutesLabel.setText("Status: waiting for reply from server");
+            try {
+                reply = (AirParcels) objectInputStream.readObject();
+                addRoutesLabel.setText(reply.getStatus());
+            } catch (IOException ex) {
+                addRoutesLabel.setText("IOException " + ex);
+            } catch (ClassNotFoundException ex) {
+                addRoutesLabel.setText("ClassNotFoundException " + ex);
+            }
+        }else{
+            homepageStatusLabel.setText("You must connect to the server first!!");
+        }
+    }
+
     private synchronized void  addNewAirport() {
         if (objectOutputStream != null && objectInputStream != null) {
             //getting the user input

@@ -537,6 +537,170 @@ public class ThreadHandler implements Runnable {
                         objectOutputStream.writeObject(res);
                     }
                 }
+                else if (airParcels.getCommand()== AirParcels.command.ADDNEWAIRLINEROUTE){
+                    //separate the user input on : and store in an array
+                    String[] separatedUserInput = userInput.split(":");
+                    String source =separatedUserInput[0].trim(); // source Airport
+                    String destination =separatedUserInput[1].trim(); // user destination airport
+                    String airline= separatedUserInput[2].trim(); // user airline name
+
+                    String airlineQry = "select id from airlines where name = ? limit 1";
+
+                    // query to check if the source airport exists or not on the database before adding assigning a route
+
+                    try(Connection conn = SqlLiteConnection.getConnection()){
+                        PreparedStatement prepStm= conn.prepareStatement(airportQry);
+                        prepStm.setString(1,source);
+                        ResultSet resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()){
+                            airParcels.setStatus("Chosen Source Airport does not exist");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+                        int source_id = resultSet.getInt(1);
+
+                        // checking if the destination airport exists on the database table
+                        prepStm= conn.prepareStatement(airportQry);
+                        prepStm.setString(1,destination);
+                        resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()){
+                            airParcels.setStatus("Chosen Destination Airport does not exist");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+                        int destination_id = resultSet.getInt(1);
+
+                        // checking if the destination airport exists on the database table
+                        prepStm= conn.prepareStatement(airlineQry);
+                        prepStm.setString(1,airline);
+                        resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()){
+                            airParcels.setStatus("Chosen AirLine does not exist");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+                        int airline_id = resultSet.getInt(1);
+
+                        String qry="insert into routes(airline_id,source_id,dest_id,equipment,stops) values(?,?,?,?,?)";
+                        prepStm = conn.prepareStatement(qry);
+                        prepStm.setInt(1,airline_id);
+                        prepStm.setInt(2,source_id);
+                        prepStm.setInt(3,destination_id);
+                        prepStm.setString(4,"737");
+                        prepStm.setInt(5,0);
+
+                        int sqlStatus = prepStm.executeUpdate();
+                        if (sqlStatus >0){
+                            airParcels.setStatus("Route Added");
+                            objectOutputStream.writeObject(airParcels);
+                        }
+                    }
+                }
+                else if(airParcels.getCommand() ==AirParcels.command.DELETEAIRLINEROUTE){
+
+                    String[] separatedUserInput = userInput.split(":");
+                    String airline =separatedUserInput[0].trim(); // airline entered
+                    String source =separatedUserInput[1].trim();  // source Airport Name
+                    String destination= separatedUserInput[2].trim(); // destination airport name
+
+                    // query to check if the source airport exists or not on the database before adding assigning a route
+                    String airlineQry = "select id from airlines where name = ? limit 1";
+                    try(Connection conn = SqlLiteConnection.getConnection()){
+                        PreparedStatement prepStm= conn.prepareStatement(airlineQry);
+                        prepStm.setString(1,airline);
+                        ResultSet resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()){
+                            airParcels.setStatus("Chosen Airline does not exist");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+                        int airline_id = resultSet.getInt(1);
+
+                        // checking if the source airport exists on the database table
+                        prepStm= conn.prepareStatement(airportQry);
+                        prepStm.setString(1,source);
+                        resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()){
+                            airParcels.setStatus("Chosen Source Airport does not exist");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+                        int source_id = resultSet.getInt(1);
+
+                        // checking if the destination airport exists on the database table
+                        prepStm= conn.prepareStatement(airportQry);
+                        prepStm.setString(1,destination);
+                        resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()){
+                            airParcels.setStatus("Chosen destination Airport does not exist");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+                        int destination_id = resultSet.getInt(1);
+
+                        // checking if the route exists in the table before deleting
+                        String routesSql = "select id from routes where source_id =?  and dest_id=? limit 1";
+                        prepStm= conn.prepareStatement(routesSql);
+                        prepStm.setInt(1,source_id);
+                        prepStm.setInt(2,destination_id);
+                        resultSet = prepStm.executeQuery();
+                        if (!resultSet.next()){
+                            airParcels.setStatus("Routes does not exist please create route on the add routes tab :)");
+                            objectOutputStream.writeObject(airParcels);
+                            continue;
+                        }
+
+                        String qry="delete from routes where airline_id=? and source_id=? and dest_id=?";
+                        prepStm = conn.prepareStatement(qry);
+                        prepStm.setInt(1,airline_id);
+                        prepStm.setInt(2,source_id);
+                        prepStm.setInt(3,destination_id);
+
+                        int sqlStatus = prepStm.executeUpdate();
+                        if(sqlStatus > 0 ){
+                            airParcels.setStatus("Route Deleted");
+                            objectOutputStream.writeObject(airParcels);
+                        }
+                    }
+                }
+                else if (airParcels.getCommand()== AirParcels.command.VIEWAIIRLINESTOPS){
+
+                    String[]separatedUserInput = userInput.split(":");
+                    String source = separatedUserInput[0].trim();
+                    String destination = separatedUserInput[1].trim();
+
+                    String sqlQry =  "select ar.name from airlines ar join routes rt on rt.airline_id=ar.id join airports ats on rt.source_id=ats.id join airports atd on rt.dest_id=atd.id where ats.name=? and atd.name =?" ;
+
+                    try(Connection conn = SqlLiteConnection.getConnection()){
+                        PreparedStatement prepStm = conn.prepareStatement(sqlQry);
+                        prepStm.setString(1,source);
+                        prepStm.setString(2,destination);
+                        ResultSet resultSet = prepStm.executeQuery();
+                        List<List<Object>> data = new ArrayList<>();
+                        while (resultSet.next()) {
+                            List<Object> column = new ArrayList<>();
+                            column.add(resultSet.getString(1));
+                            data.add(column);
+                        }
+                        if(data.size() > 0){
+                            List<String> columns = new ArrayList<>();
+                            // table columns creation
+                            columns.add("Airlines Name");
+                            TableParcel res = new TableParcel(columns, data);
+                            //sending the TableResponseParcel object with the columns and data containing the results from the SQL query
+                            objectOutputStream.writeObject(res);
+                        }
+                        else{
+                            String noResultSet = "No Airlines from " + " " + source + " airport to " + " " +destination+ " airport";
+                            List<String> columns = new ArrayList<>();
+
+                            TableParcel res = new TableParcel(columns,data,noResultSet);
+                            res.setStatus(noResultSet);
+                            objectOutputStream.writeObject(res);
+                        }
+                    }
+
+                }
 
 
             }
